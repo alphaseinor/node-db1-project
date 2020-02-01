@@ -92,4 +92,17 @@ server.put('/:id', (req, res) => {
   }
 })
 
+server.delete('/:id', (req, res) => {
+  db('accounts')
+    .where("id", req.params.id)
+    .del()
+    .then(deleted => {
+      res.status(200).json({deleted: deleted})
+    })
+    .catch(error => res.status(500).json({
+      message: "Something you entered, transcended parameters, So much is unknown.",
+      error: error
+    }))
+})
+
 module.exports = server;
