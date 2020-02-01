@@ -12,7 +12,10 @@ server.get('/', (req, res) => {
       res.status(200).json(accounts);
     })
     .catch(error => {
-      res.status(500).json({ message: "Error on GET account" })
+      res.status(500).json({ 
+        message: "Error on GET account",
+        error: error 
+      })
     })
   }
 )
@@ -29,7 +32,10 @@ server.get('/:id', (req, res) => {
       }
     })
     .catch(error => {
-      res.status(500).json({ message: "error unable to retreive account" })
+      res.status(500).json({ 
+        message: "error unable to retreive account",
+        error: error
+      })
     })
   }
 )
@@ -53,13 +59,36 @@ server.post("/", (req, res) => {
       })
       .catch(error => {
           res.status(500).json({ 
-              message: "error adding account" 
+              message: "error adding account",
+              error: error 
             }
           )
         }
       )
   } else {
-     res.status(400).json({ message: "missing name and budget." })
+     res.status(400).json({ message: "missing name and or budget" })
+  }
+})
+
+server.put('/:id', (req, res) => {
+  const id = req.params.id
+  const body = req.body
+
+  if (body.name || body.budget) {
+     db('accounts')
+        .where({ id: id })
+        .update(body)
+        .then(returned => {
+          res.status(200).json(returned);
+        })
+        .catch(error => {
+          res.status(500).json({ 
+            message: "Problem updating account." ,
+            error: error
+          })
+        });
+  } else {
+     res.status(400).json({ message: "missing name and or budget" })
   }
 })
 
