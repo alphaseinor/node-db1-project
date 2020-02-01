@@ -16,6 +16,7 @@ server.get('/', (req, res) => {
     })
   }
 )
+
 server.get('/:id', (req, res) => {
   db('accounts')
     .where({ id: req.params.id })
@@ -32,5 +33,34 @@ server.get('/:id', (req, res) => {
     })
   }
 )
+
+server.post("/", (req, res) => {
+  const body = req.body
+
+  if (body.name && body.budget) {
+    db('accounts')
+      .insert(body, "id")
+      .then(ids => {
+        const id = ids[0]
+        return db('accounts')
+            .select('id', 'name', 'budget')
+            .where({ id })
+            .first()
+            .then(account => {
+                res.status(201).json(account)
+              }
+            )
+      })
+      .catch(error => {
+          res.status(500).json({ 
+              message: "error adding account" 
+            }
+          )
+        }
+      )
+  } else {
+     res.status(400).json({ message: "missing name and budget." })
+  }
+})
 
 module.exports = server;
